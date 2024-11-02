@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Play Song with Lyrics Animation</title>
+    <style>
+        /* Styling untuk latar belakang dan teks */
+        body {
+            background: linear-gradient(to bottom, #3333ff, #ff99cc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: pink;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            padding: 20px; /* Added padding */
+        }
+
+        #playBtn {
+            background: #ff6699;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 10;
+            position: relative;
+        }
+
+        #lyrics {
+            margin-top: 20px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .lyric-line {
+            display: none;
+            font-size: 24px;
+            margin: 10px auto;
+            opacity: 0;
+            color: #ffff;
+            background-color: rgba(255, 182, 193, 0.7);
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 15px rgba(255, 105, 180, 0.5);
+            animation: fadeIn 1.5s forwards;
+            width: fit-content;
+            max-width: 80%; /* Ensure lyrics don't stretch too wide */
+            overflow: hidden;
+        }
+
+        /* Animasi bintang berkedip */
+        .star-dot {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            width: 3px;
+            height: 3px;
+            opacity: 0;
+            animation: twinkling 2s infinite ease-in-out;
+        }
+
+        /* Keyframes untuk animasi bintang berkedip */
+        @keyframes twinkling {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Animasi fade in untuk lirik */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animasi hati besar */
+        .heart {
+            position: absolute;
+            bottom: 0;
+            font-size: 48px;
+            color: #ff0000;
+            opacity: 0.8;
+            animation: loveAnimation 5s ease-in-out infinite;
+        }
+
+        /* Keyframes untuk animasi hati bergerak ke atas */
+        @keyframes loveAnimation {
+            0% { transform: scale(1); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; transform: translateY(-100vh); }
+        }
+
+        /* Animasi bintang jatuh */
+        .star {
+            position: absolute;
+            top: -50px;
+            font-size: 24px;
+            color: yellow;
+            opacity: 0.8;
+            animation: fallingStar 3s linear infinite;
+        }
+
+        /* Keyframes untuk animasi bintang jatuh */
+        @keyframes fallingStar {
+            0% {
+                transform: translate(0, 0) rotate(45deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-100vw, 100vh) rotate(45deg);
+                opacity: 0;
+            }
+        }
+
+        /* Styling dan animasi untuk bulan bercahaya */
+        .moon {
+            position: absolute;
+            top: 5%; /* Adjusted position */
+            right: 5%; /* Adjusted position */
+            font-size: 60px;
+            color: #f5e0b7;
+            animation: moonGlow 3s ease-in-out infinite alternate;
+        }
+
+        /* Keyframes untuk animasi bulan bercahaya */
+        @keyframes moonGlow {
+            0% { text-shadow: 0 0 5px #f5e0b7; opacity: 0.8; }
+            100% { text-shadow: 0 0 20px #f5e0b7, 0 0 30px #ffd700; opacity: 1; }
+        }
+
+        /* Styling untuk UFO */
+        .ufo {
+            position: absolute;
+            top: 15%; /* Adjusted position */
+            left: 5%; /* Adjusted position */
+            font-size: 50px;
+            color: #ffcc00; /* Warna UFO kuning */
+            text-shadow: 0 0 20px #ffcc00, 0 0 30px #ffcc00; /* Efek bercahaya */
+        }
+
+        .ufo.pink {
+            color: #ff69b4; /* Warna UFO pink */
+            text-shadow: 0 0 20px #ff69b4, 0 0 30px #ff69b4; /* Efek bercahaya pink */
+            top: 20%; /* Adjusted position */
+            left: 10%; /* Adjusted position */
+        }
+
+        /* Media Queries untuk responsif */
+        @media (max-width: 768px) {
+            .lyric-line {
+                font-size: 18px; /* Decrease font size */
+            }
+
+            .moon {
+                font-size: 40px; /* Smaller moon on smaller screens */
+            }
+
+            .ufo {
+                font-size: 40px; /* Smaller UFO on smaller screens */
+            }
+
+            .ufo.pink {
+                font-size: 40px; /* Smaller pink UFO */
+            }
+
+            #playBtn {
+                font-size: 16px; /* Smaller button font size */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .lyric-line {
+                font-size: 16px; /* Further decrease font size */
+            }
+
+            .moon {
+                font-size: 30px; /* Smaller moon on extra small screens */
+            }
+
+            .ufo {
+                font-size: 30px; /* Smaller UFO on extra small screens */
+            }
+
+            .ufo.pink {
+                font-size: 30px; /* Smaller pink UFO */
+            }
+
+            #playBtn {
+                font-size: 14px; /* Smaller button font size */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <button id="playBtn" onclick="playSong()">Play!</button>
+        <audio id="song" src="ssstik.io_1729798894525.mp3"></audio>
+
+        <!-- Tambahkan elemen bulan bercahaya -->
+        <div class="moon">🌙</div>
+
+        <!-- Tambahkan satu UFO kuning dan satu UFO pink -->
+        <div class="ufo">🛸</div>
+        <div class="ufo pink">🛸</div>
+
+        <!-- Lirik dengan waktu delay per baris -->
+        <div id="lyrics">
+            <p class="lyric-line" data-delay="1000">Know you're all that I want - this life</p>
+            <p class="lyric-line" data-delay="7500">I'll imagine we fell in love</p>
+            <p class="lyric-line" data-delay="11000">I'll nap under moonlight skies with you</p>
+            <p class="lyric-line" data-delay="15000">I think I'll picture us, you with the waves</p>
+            <p class="lyric-line" data-delay="17500">The ocean's colors on your face</p>
+            <p class="lyric-line" data-delay="22500">I'll leave my heart with your air</p>
+            <p class="lyric-line" data-delay="26000">So let me fly with you</p>
+            <p class="lyric-line" data-delay="30000">Will you be forever with me?</p>
+        </div>
+    </div>
+    <script>
+        // Fungsi untuk menciptakan bintang berkelip di tempat acak
+        function createTwinklingStars() {
+            const container = document.querySelector('.container');
+            const starCount = 100; // Jumlah bintang
+
+            for (let i = 0; i < starCount; i++) {
+                const starDot = document.createElement('div');
+                starDot.classList.add('star-dot');
+                starDot.style.top = Math.random() * 100 + 'vh';
+                starDot.style.left = Math.random() * 100 + 'vw';
+
+                // Menambahkan penundaan acak ke animasi bintang
+                starDot.style.animationDelay = Math.random() * 2 + 's';
+
+                container.appendChild(starDot);
+            }
+        }
+
+        // Panggil fungsi untuk membuat bintang setelah halaman dimuat
+        window.onload = createTwinklingStars;
+
+        // Fungsi untuk memutar lagu dan menampilkan lirik sesuai timing
+        function playSong() {
+            const song = document.getElementById('song');
+            const lyrics = document.querySelectorAll('.lyric-line');
+
+            song.play();
+
+            lyrics.forEach((line) => {
+                setTimeout(() => {
+                    line.style.display = 'block';
+                    line.style.animation = 'fadeIn 2s forwards';
+                    createLoveAnimation();
+                    createFallingStar();
+                }, line.dataset.delay);
+            });
+
+            // Hitung total waktu untuk menghilangkan lirik setelah semua lirik muncul
+            const totalDelay = Math.max(...Array.from(lyrics).map(line => parseInt(line.dataset.delay))) + 5000;
+            setTimeout(() => {
+                document.getElementById('lyrics').style.display = 'none';
+            }, totalDelay);
+        }
+
+        // Fungsi untuk menciptakan animasi hati besar di kiri dan kanan layar
+        function createLoveAnimation() {
+            const container = document.querySelector('.container');
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+
+            const isLeft = Math.random() < 0.5;
+            heart.style.left = isLeft ? '10%' : '90%';
+            heart.style.animationDuration = Math.random() * 2 + 3 + 's';
+            heart.innerHTML = '❤';
+            container.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+        }
+
+        // Fungsi untuk menciptakan animasi bintang jatuh
+        function createFallingStar() {
+            const container = document.querySelector('.container');
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.innerHTML = '★';
+            star.style.left = Math.random() * 100 + 'vw';
+            container.appendChild(star);
+
+            setTimeout(() => {
+                star.remove();
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>
